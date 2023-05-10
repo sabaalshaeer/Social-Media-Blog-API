@@ -2,10 +2,12 @@ package Controller;
 
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import DAO.AccountDAO;
 import Model.Account;
 import Service.AccountService;
 import io.javalin.Javalin;
@@ -19,6 +21,8 @@ import io.javalin.http.Context;
  * controller may be built.
  */
 public class SocialMediaController {
+    private final AccountDAO accountDAO;
+
     Javalin app;
 
     AccountService accountService;
@@ -27,6 +31,8 @@ public class SocialMediaController {
         // this creates the Javalin app
         this.app = Javalin.create();
         this.accountService = new AccountService();
+        this.accountDAO = new AccountDAO();
+
     }
 
     /**
@@ -44,6 +50,8 @@ public class SocialMediaController {
     // return app;
     // }
 
+    
+
     public Javalin startAPI() {
         app.post("/register", ctx -> {
 
@@ -55,7 +63,7 @@ public class SocialMediaController {
             if (addNewAccount == null) {
                 ctx.status(400); // Set the response status to 400 if registration is not successful
             } else {
-                // using the ObjectMapper instance mapper to convert the Java object
+                // using the ObjectMapper instance om to convert the Java object
                 // addedAccount into a JSON string using the writeValueAsString() method.
                 // Then, it's setting the response body of the HTTP response to this JSON string
                 // using ctx.json()
@@ -64,7 +72,7 @@ public class SocialMediaController {
         });
         return app;
 
-    }
+     }
 
     /**
      * This is an example handler for an example endpoint.

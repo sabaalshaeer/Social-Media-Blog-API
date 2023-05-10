@@ -1,5 +1,6 @@
 package Service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class AccountService {
         this.accountDAO = new AccountDAO();
     }
 
-    public Account addAccount(Account account) {
+    public Account addAccount(Account account) throws IOException {
         Account createdAccount = accountDAO.createAccount(account);
         if (createdAccount == null) {
             return null;
@@ -23,6 +24,11 @@ public class AccountService {
             return createdAccount;
         }
     }
+
+    // public Account addAccount(Account account)  {
+    //     return accountDAO.createAccount(account);
+    
+    // }
 
     
     public boolean authenticate(String username, String password) {
