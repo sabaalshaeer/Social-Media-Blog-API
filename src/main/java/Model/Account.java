@@ -98,10 +98,10 @@ public class Account {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return account_id == account.account_id && username.equals(account.username) && password.equals(account.password);
+        if (this == o) return true; //checks if the two objects being compared are the same object. returns true, because two references to the same object are always equal
+        if (o == null || getClass() != o.getClass()) return false;//if the object being compared is null or not an instance of the Account class. If it is, the method returns false, because two objects of different types cannot be equal.
+        Account account = (Account) o; //If the object being compared is an instance of the Account class, the method casts it to an Account object.
+        return account_id == account.account_id && username.equals(account.username) && password.equals(account.password);//if these fields are equal the method will return true
     }
     /**
      * Overriding the default toString() method allows for easy debugging.

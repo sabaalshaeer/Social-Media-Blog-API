@@ -122,7 +122,9 @@ public class Message {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Message message = (Message) o;
+        Message message = (Message) o;//we need this linebecuase , in this method we need to compare the all fileds of the 2 'Message' Objects 
+                                      //for equality. To do this, it needs to access these fields of the Message object passed in as the Object o parameter. 
+                                      //However, since Object does not have these fields, we need to cast o to the Message class to access these fields.
         return message_id == message.message_id && posted_by == message.posted_by
                 && time_posted_epoch == message.time_posted_epoch && message_text.equals(message.message_text);
     }
