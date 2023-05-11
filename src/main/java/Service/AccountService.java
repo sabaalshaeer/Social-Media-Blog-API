@@ -43,6 +43,7 @@ public class AccountService {
         return accountDAO.getAccountByUsernameAndPassword(username, password);
     }
 
+
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }

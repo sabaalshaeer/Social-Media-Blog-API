@@ -44,8 +44,7 @@ public Account createAccount(Account account) {
         if (pkeyResultSet.next()) {
             // if pkeyResultSet exists , Retrieving the generated account_id
             int generated_account_id = (int) pkeyResultSet.getLong(1);
-            // Creating a new Account object with the generated account_id and the username
-            // and password of the input account
+            // Creating a new Account object with the generated account_id and the usernam and password of the input account
             return new Account(generated_account_id, account.getUsername(), account.getPassword());
         }
     } catch (SQLException e) {
@@ -56,8 +55,6 @@ public Account createAccount(Account account) {
     // Returning null if no account was created
     return null;
 }
-
-
 
 
     // check if there is account with the same username
@@ -85,11 +82,17 @@ public Account createAccount(Account account) {
 
     }
 
+
     // login -- This method will handle the user login by verifying if the provided
     // username and password match a real account existing in the database.
     public Account getAccountByUsernameAndPassword(String username, String password) {
 
-        try {
+        try { 
+            // Check if the username already exists in the database
+            if (!checkUsernameAndPasswordExists(username, password)) {
+                throw new IOException("Username and password do not exist"); 
+            }
+
             // SQL logic to retrive account with specifce username and password
             String sql = "select * from account where username = ? and password = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -106,9 +109,30 @@ public Account createAccount(Account account) {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
+
+     // check if there is account with the same username and password
+     public boolean checkUsernameAndPasswordExists(String username, String password) {
+        try {
+            String sql = "SELECT COUNT(*) FROM account WHERE username = ? AND password = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+    
+            ResultSet rs = preparedStatement.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+            return count > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+    
 
     // This method retrieves all accounts from the account table in the database and
     // returns them as a list of Account objects.
