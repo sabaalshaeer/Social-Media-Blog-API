@@ -70,11 +70,6 @@ public Account createAccount(Account account) {
             int count = rs.getInt(1);
             return count > 0;
 
-            // Check if the ResultSet has any rows (i.e., if the username exists in the
-            // database)
-            // if (rs.next()) {
-            // return true;
-            // }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -86,7 +81,6 @@ public Account createAccount(Account account) {
     // login -- This method will handle the user login by verifying if the provided
     // username and password match a real account existing in the database.
     public Account getAccountByUsernameAndPassword(String username, String password) {
-
         try { 
             // Check if the username already exists in the database
             if (!checkUsernameAndPasswordExists(username, password)) {

@@ -3,16 +3,14 @@ package Controller;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.eclipse.jetty.util.security.Password;
-
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import DAO.AccountDAO;
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -29,9 +27,11 @@ public class SocialMediaController {
     Javalin app;
 
     AccountService accountService;
+    MessageService messageService;
 
     public SocialMediaController() {
         this.accountService = new AccountService();
+        this.messageService = new MessageService();
 
     }
 
@@ -48,6 +48,7 @@ public class SocialMediaController {
         this.app = Javalin.create();
         app.post("/register", this::postAccountHandler);
         app.post("/login", this::loginAccountHandler);
+        app.post("/messages", this::postMessageHandler);
 
         return app;
     }
@@ -58,11 +59,13 @@ public class SocialMediaController {
      * 
      * @param context The Javalin Context object manages information about both the
      *                HTTP request and response.
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      * @throws IOException
      * @throws SQLException
      */
 
-    private void postAccountHandler(Context ctx) throws IOException {
+    private void postAccountHandler(Context ctx) throws JsonMappingException, JsonProcessingException  {
         //ObjectMapper is used to convert the HTTP request body (which is in JSON format) into an instance of the Account class, 
         //which represents the user's account information. This is done using the readValue() method of the ObjectMapper class.
         ObjectMapper om = new ObjectMapper();
@@ -80,7 +83,7 @@ public class SocialMediaController {
     }
 
     //Handles a login request 
-    private void loginAccountHandler(Context ctx) throws IOException, SQLException {
+    private void loginAccountHandler(Context ctx) throws JsonMappingException, JsonProcessingException, SQLException   {
         // ObjectMapper provides functionality for converting Java objects to JSON format and vice versa.
         ObjectMapper om = new ObjectMapper();
         // Convert the request body to an Account object
@@ -95,6 +98,21 @@ public class SocialMediaController {
             ctx.status(401); 
         } else {
             ctx.json(om.writeValueAsString(login));
+        }
+    }
+    private void postMessageHandler(Context ctx) throws JsonProcessingException  {
+        // ObjectMapper provides functionality for converting Java objects to JSON format and vice versa.
+        ObjectMapper om = new ObjectMapper();
+        // Convert the request body to an Message object
+        Message message = om.readValue(ctx.body(), Message.class);
+    
+        // Verify the login credentials by calling the accountService method
+        Message addMessage = messageService.addMessage(message);
+        // If login is null, the credentials were invalid, so respond with a 401 status code
+        if (addMessage == null) {
+            ctx.status(400); 
+        } else {
+            ctx.json(om.writeValueAsString(addMessage));
         }
     }
 

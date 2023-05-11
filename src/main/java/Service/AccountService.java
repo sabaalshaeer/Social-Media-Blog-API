@@ -16,7 +16,7 @@ public class AccountService {
         this.accountDAO = new AccountDAO();
     }
 
-    public Account addAccount(Account account) throws IOException {
+    public Account addAccount(Account account) {
         Account createdAccount = accountDAO.createAccount(account);
         if (createdAccount == null) {
             return null;
@@ -30,14 +30,6 @@ public class AccountService {
     
     // }
 
-    
-    public boolean authenticate(String username, String password) {
-        Account account = accountDAO.getAccountByUsernameAndPassword(username, password);
-        if (account == null) {
-            return false;
-        }
-        return true;
-    }
     
     public Account getAccountByUsernameAndPassword(String username, String password) throws SQLException {
         return accountDAO.getAccountByUsernameAndPassword(username, password);
