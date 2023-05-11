@@ -72,5 +72,30 @@ public class MessageDAO {
         return false;
     }
     
+    public List<Message> getAllMessages(){
+        try(
+            PreparedStatement ps = connection.prepareStatement("select * from message;");
+//            because we want to retrieve data meaningfully in java, we have to expect data in the form of a 'resultset'
+//            we also have to use executeQuery instead of executeUpdate, because executeQuery is expecting a resultSet
+            ResultSet rs = ps.executeQuery()){
+            List<Message> allMessage = new ArrayList<>();
+//            we have to loop through the entire resultset for every item it contains
+            while(rs.next()){
+//                we have to extract the DB column of each row into a meaningful java object
+                Message message = new Message(
+                    rs.getInt("message_id"),
+                    rs.getInt("posted_by"),
+                     rs.getString("message_text"),
+                     rs.getLong("time_posted_epoch"));
+                    // Add the newly created Account object to the list
+                     allMessage.add(message);
+            }
+            return allMessage;
 
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+//        in the event that we don't get to return allMessage because a SQLException was thrown, just return null
+        return null;
+    }
 }

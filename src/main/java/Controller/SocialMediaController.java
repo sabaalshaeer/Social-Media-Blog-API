@@ -2,6 +2,7 @@ package Controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -46,9 +47,19 @@ public class SocialMediaController {
     public Javalin startAPI() {
         // this creates the Javalin app
         this.app = Javalin.create();
+        // endpoint that register new account
         app.post("/register", this::postAccountHandler);
+        // endpoint for login
         app.post("/login", this::loginAccountHandler);
+        // endpoint that create new message
         app.post("/messages", this::postMessageHandler);
+        
+        // endpoint that returns all message ( other way to use endpoint)
+        app.get("/messages", ctx -> {
+            // This uses the message service class to get all the messages. Then turns to JSON and responds to request
+        List<Message> allMessages = messageService.getAllMessages();
+        ctx.json(allMessages);
+        });
 
         return app;
     }
@@ -100,6 +111,7 @@ public class SocialMediaController {
             ctx.json(om.writeValueAsString(login));
         }
     }
+    //Handler for adding new message
     private void postMessageHandler(Context ctx) throws JsonProcessingException  {
         // ObjectMapper provides functionality for converting Java objects to JSON format and vice versa.
         ObjectMapper om = new ObjectMapper();
@@ -115,6 +127,8 @@ public class SocialMediaController {
             ctx.json(om.writeValueAsString(addMessage));
         }
     }
+
+    
 
     
 

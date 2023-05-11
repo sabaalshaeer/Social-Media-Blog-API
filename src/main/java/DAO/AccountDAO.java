@@ -127,19 +127,20 @@ public Account createAccount(Account account) {
         return false;
     }
     
-
+    //I have these next to methods but it did not required in theis pre-project
     // This method retrieves all accounts from the account table in the database and
     // returns them as a list of Account objects.
     public List<Account> getAllAccounts() {
 
         // SQL logic here to get all accounts
-        String sql = "SELECT * FROM account";
+        String sql = "SELECT * FROM account;";
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet rs = preparedStatement.executeQuery()) { // method uses a try-with-resources block to
                                                                    // automatically close the Connection,
                                                                    // PreparedStatement, and ResultSet objects after
-                                                                   // they are used.
+                                                                    // they are used.
+                List<Account> allAccount = new ArrayList<>();                                                   
             // Loop through each row in the ResultSet
             while (rs.next()) {
                 // For each row, create a new Account object using the data from the current row
@@ -148,13 +149,13 @@ public Account createAccount(Account account) {
                         rs.getString("username"),
                         rs.getString("password"));
                 // Add the newly created Account object to the list
-                accountList.add(account);
+                allAccount.add(account);
+                return allAccount;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        // Return the final list of Account objects retrieved from the database
-        return accountList;
+        return null;
     }
 
     // This method retrieves a specific account from the database using its ID, and
