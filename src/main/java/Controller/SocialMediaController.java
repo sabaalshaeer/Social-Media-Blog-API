@@ -60,6 +60,9 @@ public class SocialMediaController {
         List<Message> allMessages = messageService.getAllMessages();
         ctx.json(allMessages);
         });
+        // endpoint that returns message with specific id
+        app.get("/messages/{message_id}", this::getMessageByIdHandler);
+            
 
         return app;
     }
@@ -126,6 +129,22 @@ public class SocialMediaController {
         } else {
             ctx.json(om.writeValueAsString(addMessage));
         }
+    }
+    //Handler to get message by its id
+    private void getMessageByIdHandler(Context ctx) throws JsonProcessingException  {
+        ObjectMapper om = new ObjectMapper();
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+         // Get the message by its ID from the message service
+        Message message = messageService.getMessageById(messageId);
+        
+        if (message == null) {
+            // If no message is found, set the status code to 200 and send an empty response body, which is what the test is expecting.
+            ctx.status(200).json("");
+        } else {
+            // If a message is found, return it as a JSON response
+            ctx.json(om.writeValueAsString(message));
+        }
+
     }
 
     
