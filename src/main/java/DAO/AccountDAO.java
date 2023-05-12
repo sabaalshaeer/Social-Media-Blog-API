@@ -139,14 +139,14 @@ public Account createAccount(Account account) {
         return false;
     }
     
-    //I have these next to methods but it did not required in theis pre-project
+    //I have these next to methods but it did not required in this pre-project
     // This method retrieves all accounts from the account table in the database and
     // returns them as a list of Account objects.
     public List<Account> getAllAccounts() {
 
         // SQL logic here to get all accounts
         String sql = "SELECT * FROM account;";
-        try (
+        try (//Using try-with-resource to avoid closing resources
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet rs = preparedStatement.executeQuery()) { // method uses a try-with-resources block to
                                                                    // automatically close the Connection,

@@ -150,29 +150,65 @@ public class MessageDAO {
         return null;
     }
 
-    // public Message getMessagesById(int id) {
-    // Message message = null;
+    /*
+     * Delete a Message Given Message Id
+     * As a User, I should be able to submit a DELETE request on the endpoint DELETE
+     * localhost:8080/messages/{message_id}.
+     * The deletion of an existing message should remove an existing message from
+     * the database. If the message existed, the response body should contain the
+     * now-deleted message.
+     * The response status should be 200, which is the default.
+     * If the message did not exist, the response status should be 200, but the
+     * response body should be empty.
+     * This is because the DELETE verb is intended to be idempotent, ie, multiple
+     * calls to the DELETE endpoint should respond with the same type of response.
+     */
+    public Message deleteMessageById(int id) {
+        try {
+            // Create a new prepared statement that deletes a message with the given ID
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM message WHERE message_id = ?;");
+            // Set the value of the parameter in the SQL statement to the given ID
+            ps.setInt(1, id);
+            // Execute the SQL statement and get the result set
+            ResultSet rs = ps.executeQuery();
+            // If a message with the given ID exists in the "message" table
+            if (rs.next()) {
+                // Get the message details from the result set
+                int postedBy = rs.getInt("posted_by");
+                String messageText = rs.getString("message_text");
+                long timePostedEpoch = rs.getLong("time_posted_epoch");
+                // Prepare a SQL statement to delete the message with the given ID from the "message" table
+                ps = connection.prepareStatement("DELETE FROM message WHERE message_id = ?;");
+                // Set the value of the parameter in the SQL statement to the given ID
+                ps.setInt(1, id);
+                // Execute the SQL statement and get the number of rows affected (should be 1 if the message was deleted)
+                int rowsAffected = ps.executeUpdate();
+                // If the message was successfully deleted
+                if (rowsAffected > 0) {
+                    // Create a new Message object with the details of the deleted message and return it
+                    return new Message(id, postedBy, messageText, timePostedEpoch);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        // Return null if no message was deleted 
+        return null;
+    }
 
-    // try {
-    // PreparedStatement ps = connection.prepareStatement("SELECT * FROM message
-    // WHERE message_id = ?");
-    // ps.setInt(1, id);
 
-    // ResultSet rs = ps.executeQuery();
+    /*
+     * Update Message Given Message Id
+    As a user, I should be able to submit a PATCH request on the endpoint PATCH localhost:8080/messages/{message_id}. 
+    The request body should contain a new message_text values to replace the message identified by message_id. 
+    The request body can not be guaranteed to contain any other information.
+    The update of a message should be successful if and only if the message id already exists and the new message_text is not blank and is not over 255 characters. 
+    If the update is successful, the response body should contain the full updated message (including message_id, posted_by, message_text, and time_posted_epoch), 
+    and the response status should be 200, which is the default. The message existing on the database should have the updated message_text.
+    If the update of the message is not successful for any reason, the response status should be 400. (Client error)
+     */
 
-    // if (rs.next()) {
-    // message = new Message(
-    // rs.getInt("message_id"),
-    // rs.getInt("posted_by"),
-    // rs.getString("message_text"),
-    // rs.getLong("time_posted_epoch")
-    // );
-    // }
-    // } catch (SQLException e) {
-    // System.out.println(e.getMessage());
-    // }
 
-    // return message;
-    // }
+     
 
 }

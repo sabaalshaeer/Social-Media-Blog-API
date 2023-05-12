@@ -62,6 +62,8 @@ public class SocialMediaController {
         });
         // endpoint that returns message with specific id
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
+        // endpoint for deleting message with specific id
+        app.delete("/messages/{message_id}", this::DeleteMessageByIdHandler);
             
 
         return app;
@@ -140,6 +142,23 @@ public class SocialMediaController {
         if (message == null) {
             // If no message is found, set the status code to 200 and send an empty response body, which is what the test is expecting.
             ctx.status(200).json("");
+        } else {
+            // If a message is found, return it as a JSON response
+            ctx.json(om.writeValueAsString(message));
+        }
+
+    }
+
+    //Handler to delete message by its id
+    private void DeleteMessageByIdHandler(Context ctx) throws JsonProcessingException  {
+        ObjectMapper om = new ObjectMapper();
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+         // Get the message by its ID from the message service
+        Message message = messageService.deleteMessageById(messageId);
+        
+        if (message == null) {
+            // If no message is found, set the status code to 200 and send an empty response body, which is what the test is expecting.
+            ctx.status(200).json("");           
         } else {
             // If a message is found, return it as a JSON response
             ctx.json(om.writeValueAsString(message));
