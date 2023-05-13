@@ -39,13 +39,8 @@ public class MessageService {
         return MessageDAO.updateMessage(id, message);
     }
 
-    // public List<Message> getAllMessagesForUser(int account_id){
-    //     return MessageDAO.getAllMessagesForUser(account_id);
-
-    // }
-
     public List<Message> getAllMessagesForUser(int account_id){
-        return MessageDAO.getAllMessagesForUser1(account_id);
+        return MessageDAO.getAllMessagesForUser(account_id);
 
     }
     

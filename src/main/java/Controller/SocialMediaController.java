@@ -238,27 +238,27 @@ public class SocialMediaController {
         //"account_id" is a path parameter in the URL of an API endpoint that retrieves all messages for a specific account.
         int accountId = Integer.parseInt(ctx.pathParam("account_id"));
         
-          // Check if the account exists
-    Account account = accountService.getAccountById(accountId);
-    if (account == null) {
-        ctx.status(200).json(new ArrayList<>());
-        return;
-    }
+    //       // Check if the account exists
+    // Account account = accountService.getAccountById(accountId);
+    // if (account == null) {
+    //     ctx.status(200).json(new ArrayList<>());
+    //     return;
+    // }
         
         // Get the messages by account ID from the message service
         List<Message> messages = messageService.getAllMessagesForUser(accountId);
 
 
-         // Check if there are any messages
-    if (!messages.isEmpty()) {
-        // Check if the messages belong to the specified account
-        for (Message message : messages) {
-            if (message.getPosted_by() != accountId) {
-                ctx.status(200).json(new ArrayList<>());
-                                return;
-            }
-        }
-       // if (!(messages.isEmpty())) {
+    //      // Check if there are any messages
+    // if (!messages.isEmpty()) {
+    //     // Check if the messages belong to the specified account
+    //     for (Message message : messages) {
+    //         if (message.getPosted_by() != accountId) {
+    //             ctx.status(200).json(new ArrayList<>());
+    //                             return;
+    //         }
+    //     }
+      if (!(messages.isEmpty())) {
             ctx.json(messages);
             //System.out.println(messages);
         } else {

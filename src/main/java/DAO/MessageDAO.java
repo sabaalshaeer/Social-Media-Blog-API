@@ -302,17 +302,17 @@ public class MessageDAO {
      */
 
     public static List<Message> getAllMessagesForUser(int account_id) {
-        if (account_id <= 0) {
-            try {
-                throw new IOException("Account ID must be greater than 0");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        // if (account_id <= 0) {
+        //     try {
+        //         throw new IOException("Account ID must be greater than 0");
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     }
+        // }
         List<Message> listOfMessage = new ArrayList<>();
 
         // Get the messages by account ID from the database
-        String sql = "SELECT * FROM messages WHERE posted_by = ?;";
+        String sql = "select * from message WHERE posted_by = ?;";
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
             preparedStatement.setInt(1, account_id);
@@ -332,60 +332,60 @@ public class MessageDAO {
             System.out.println(e.getMessage());
         }
 
-        // // Check if there are any messages
-        // if (!listOfMessage.isEmpty()) {
-        // // There are messages
-        // return listOfMessage;
+        // Check if there are any messages
+        if (!listOfMessage.isEmpty()) {
+        // There are messages
+        return listOfMessage;
 
-        // } else {
-        // // No messages found
+        } else {
+        // No messages found
         return Collections.emptyList();
-        // }
+         }
     }
 
-    public static List<Message> getAllMessagesForUser1(int account_id) {
-        if (account_id <= 0) {
-            try {
-                throw new IOException("Account ID must be greater than 0");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        try {
-            // Check if there are any messages for the specified account
-            String sql = "SELECT COUNT(*) FROM messages WHERE posted_by = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, account_id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int count = resultSet.getInt(1);
+//     public static List<Message> getAllMessagesForUser1(int account_id) {
+//         if (account_id <= 0) {
+//             try {
+//                 throw new IOException("Account ID must be greater than 0");
+//             } catch (IOException e) {
+//                 e.printStackTrace();
+//             }
+//         try {
+//             // Check if there are any messages for the specified account
+//             String sql = "SELECT COUNT(*) FROM message WHERE posted_by = ?";
+//             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+//             preparedStatement.setInt(1, account_id);
+//             ResultSet resultSet = preparedStatement.executeQuery();
+//             resultSet.next();
+//             int count = resultSet.getInt(1);
 
-            // If there are no messages, return an empty list
-            if (count == 0) {
-                return Collections.emptyList();
-            }
-            // Get the messages by account ID from the database
-            sql = "SELECT * FROM messages WHERE posted_by = ?";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, account_id);
-            resultSet = preparedStatement.executeQuery();
-            List<Message> messagesList = new ArrayList<>();
-            while (resultSet.next()) {
-                Message message = new Message();
-                resultSet.getInt("message_id");
-                resultSet.getInt("posted_by");
-                resultSet.getString("message_text");
-                resultSet.getLong("time_posted_epoch");
-                messagesList.add(message);
-            }
+//             // If there are no messages, return an empty list
+//             if (count == 0) {
+//                 return Collections.emptyList();
+//             }
+//             // Get the messages by account ID from the database
+//             sql = "SELECT * FROM message WHERE posted_by = ?";
+//             preparedStatement = connection.prepareStatement(sql);
+//             preparedStatement.setInt(1, account_id);
+//             resultSet = preparedStatement.executeQuery();
+//             List<Message> messagesList = new ArrayList<>();
+//             while (resultSet.next()) {
+//                 Message message = new Message();
+//                 resultSet.getInt("message_id");
+//                 resultSet.getInt("posted_by");
+//                 resultSet.getString("message_text");
+//                 resultSet.getLong("time_posted_epoch");
+//                 messagesList.add(message);
+//             }
 
-            return messagesList;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+//             return messagesList;
+//         } catch (SQLException e) {
+//             System.out.println(e.getMessage());
+//         }
         
-    }
-    return Collections.emptyList();
-}
+//     }
+//     return Collections.emptyList();
+// }
 
     // public static boolean checkIfListOfMessagesExistFOrAccount(int account_id){
     // try{
