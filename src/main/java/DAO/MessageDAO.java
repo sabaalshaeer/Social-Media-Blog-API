@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+import Model.Account;
 import Model.Message;
 import Util.ConnectionUtil;
 
@@ -221,57 +222,73 @@ public class MessageDAO {
         try {
             // Check if the message with the given ID exists in the database
             if (!checkMessageInDbById(id)) {
-                throw new IOException("Message with ID " + id + " does not exist");
-
-            }
-            // Check if the new message meets the required criteria
-            if (message.getMessage_text().isEmpty() || message.getMessage_text().length() > 255) {
-                throw new IOException("Message text is empty or length greater than 255");
-            }
-
-            // Write SQL logic here
-            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, message.getMessage_text());
-            // preparedStatement.setLong(2, message.getTime_posted_epoch());
-            preparedStatement.setInt(2, id);
-
-            // Execute the SQL statement and get the number of rows affected (should be 1 if
-            // the message was updated)
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            // If the message was successfully updated
-            if (rowsAffected > 0) {
-                // Get the updated message from the database
-                Message updatedMessage = getMessagesById(id);
-                return updatedMessage;
-
-            } else {
                 return null;
             }
-        } catch (SQLException | IOException e) {
+            // Check if the new message meets the required criteria
+            // if (message.getMessage_text().isBlank() || message.getMessage_text().length()
+            // > 255) {
+            // return null;
+            // }
+            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?";
+
+            // Create PreparedStatement object
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            // Set PreparedStatement parameters
+            preparedStatement.setString(1, message.getMessage_text());
+            preparedStatement.setInt(2, id);
+
+            // Execute update statement
+            int rowsUpdated = preparedStatement.executeUpdate();
+            // If the message was successfully updated
+            if (rowsUpdated > 0) {
+                // Get the updated message from the database
+                Message updatedMessage = getMessagesById(id);
+
+                // Check if the new message meets the required criteria
+                // if (updatedMessage.getMessage_text().isBlank() ||
+                // updatedMessage.getMessage_text().length() > 255) {
+                // return null;
+                // }
+                return updatedMessage;
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     // Check if message with giving id exists in the Database
+
     public static boolean checkMessageInDbById(int id) {
-        try {
-            String sql = "SELECT COUNT(*) FROM message WHERE message_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, id);
-
-            ResultSet rs = preparedStatement.executeQuery();
-            rs.next();
-            int count = rs.getInt(1);
-            return count > 0;
-
+        try (PreparedStatement stmt = connection
+                .prepareStatement("SELECT 1 FROM message WHERE message_id = ? LIMIT 1")) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
+
+    // public static boolean checkMessageInDbById(int id) {
+    // try {
+    // String sql = "SELECT COUNT(*) FROM message WHERE message_id = ?";
+    // PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    // preparedStatement.setInt(1, id);
+
+    // ResultSet rs = preparedStatement.executeQuery();
+    // rs.next();
+    // int count = rs.getInt(1);
+    // return count > 0;
+
+    // } catch (SQLException e) {
+    // e.printStackTrace();
+    // }
+    // return false;
+    // }
 
     /*
      * Get All Messages From User Given Account Id
@@ -284,15 +301,21 @@ public class MessageDAO {
      * The response status should always be 200, which is the default
      */
 
-     public static List<Message> getAllMessagesForUser(int accountId) {
+    public static List<Message> getAllMessagesForUser(int account_id) {
+        if (account_id <= 0) {
+            try {
+                throw new IOException("Account ID must be greater than 0");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         List<Message> listOfMessage = new ArrayList<>();
-    
+
         // Get the messages by account ID from the database
-        String sql = "SELECT * FROM messages WHERE posted_by = ?";
+        String sql = "SELECT * FROM messages WHERE posted_by = ?;";
         try (
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ) {
-            preparedStatement.setInt(1, accountId);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+            preparedStatement.setInt(1, account_id);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Message message = new Message();
@@ -300,59 +323,69 @@ public class MessageDAO {
                 message.setPosted_by(resultSet.getInt("posted_by"));
                 message.setMessage_text(resultSet.getString("message_text"));
                 message.setTime_posted_epoch(resultSet.getLong("time_posted_epoch"));
+                // if (message.getPosted_by() == account_id) { // check if the posted_by field
+                // matches the account ID
                 listOfMessage.add(message);
+                // }
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-    
-        // Check if there are any messages
-        if (listOfMessage.isEmpty()) {
-            // No messages found
-            return Collections.emptyList();
-        } else {
-            // There are messages
-            return listOfMessage;
-        }
+
+        // // Check if there are any messages
+        // if (!listOfMessage.isEmpty()) {
+        // // There are messages
+        // return listOfMessage;
+
+        // } else {
+        // // No messages found
+        return Collections.emptyList();
+        // }
     }
-    // public static List<Message> getAllMessagesForUser(int account_id) {
-    //     try {
-    //         // Check if there are any messages for the specified account
-    //         String sql = "SELECT COUNT(*) FROM messages WHERE posted_by = ?";
-    //         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-    //         preparedStatement.setInt(1, account_id);
-    //         ResultSet resultSet = preparedStatement.executeQuery();
-    //         resultSet.next();
-    //         int count = resultSet.getInt(1);
 
-    //         // If there are no messages, return an empty list
-    //         if (count == 0) {
-    //             return Collections.emptyList();
-    //         }
-    //         // Get the messages by account ID from the database
-    //         sql = "SELECT * FROM messages WHERE posted_by = ?";
-    //         preparedStatement = connection.prepareStatement(sql);
-    //         preparedStatement.setInt(1, account_id);
-    //         resultSet = preparedStatement.executeQuery();
-    //         List<Message> messagesList = new ArrayList<>();
-    //         while (resultSet.next()) {
-    //             Message message = new Message();
-    //             resultSet.getInt("message_id");
-    //             resultSet.getInt("posted_by");
-    //             resultSet.getString("message_text");
-    //             resultSet.getLong("time_posted_epoch");
-    //             messagesList.add(message);
-    //         }
+    public static List<Message> getAllMessagesForUser1(int account_id) {
+        if (account_id <= 0) {
+            try {
+                throw new IOException("Account ID must be greater than 0");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        try {
+            // Check if there are any messages for the specified account
+            String sql = "SELECT COUNT(*) FROM messages WHERE posted_by = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, account_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            int count = resultSet.getInt(1);
 
-    //         System.out.println("Messages for account " + account_id + ": " + messagesList);
-    //         System.out.println();
+            // If there are no messages, return an empty list
+            if (count == 0) {
+                return Collections.emptyList();
+            }
+            // Get the messages by account ID from the database
+            sql = "SELECT * FROM messages WHERE posted_by = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, account_id);
+            resultSet = preparedStatement.executeQuery();
+            List<Message> messagesList = new ArrayList<>();
+            while (resultSet.next()) {
+                Message message = new Message();
+                resultSet.getInt("message_id");
+                resultSet.getInt("posted_by");
+                resultSet.getString("message_text");
+                resultSet.getLong("time_posted_epoch");
+                messagesList.add(message);
+            }
 
-    //         return messagesList;
-    //     } catch (SQLException e) {
-    //         System.out.println(e.getMessage());
-    //     }
-    //     return Collections.emptyList();
-    // }
+            return messagesList;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        
+    }
+    return Collections.emptyList();
+}
 
     // public static boolean checkIfListOfMessagesExistFOrAccount(int account_id){
     // try{
@@ -369,39 +402,5 @@ public class MessageDAO {
     // }
     // return false;
     // }
-
-    public Message updateMessage(Message messageToUpdate) {
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            // Define SQL update statement
-            String sql = "UPDATE message SET posted_by = ?, message_text = ?, time_posted_epoch = ? WHERE message_id = ?";
-    
-            // Create PreparedStatement object
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-    
-            // Set PreparedStatement parameters
-            preparedStatement.setInt(1, messageToUpdate.getPosted_by());
-            preparedStatement.setString(2, messageToUpdate.getMessage_text());
-            preparedStatement.setLong(3, messageToUpdate.getTime_posted_epoch());
-            preparedStatement.setInt(4, messageToUpdate.getMessage_id());
-    
-            // Execute update statement
-            int rowsUpdated = preparedStatement.executeUpdate();
-            if (rowsUpdated == 0) {
-                throw new SQLException("Failed to update the Message record.");
-            }
-    
-            // Close resources
-            preparedStatement.close();
-            connection.close();
-    
-            // Return updated Message object
-            return messageToUpdate;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-    
 
 }
