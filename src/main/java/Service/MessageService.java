@@ -1,7 +1,6 @@
 package Service;
 
-import java.io.IOException;
-import java.sql.SQLException;
+
 import java.util.List;
 
 import DAO.MessageDAO;
@@ -15,7 +14,7 @@ public class MessageService {
     }
 
     public Message addMessage(Message message) {
-        Message createdMessage = messageDAO.createMessage(message);
+        Message createdMessage = MessageDAO.createMessage(message);
         if (createdMessage == null) {
             return null;
         } else {
@@ -24,18 +23,64 @@ public class MessageService {
     }
 
     public List<Message> getAllMessages(){
-        return messageDAO.getAllMessages();
+        return MessageDAO.getAllMessages();
     }
 
     public Message getMessageById(int id){
-        return messageDAO.getMessagesById(id);
+        return MessageDAO.getMessagesById(id);
     }
 
     public Message deleteMessageById(int id){
-       return messageDAO.deleteMessageById(id);
+       return MessageDAO.deleteMessageById(id);
       
     }
 
+    public Message updateMessageById(int id, Message message){
+        return MessageDAO.updateMessage(id, message);
+    }
+
+    public List<Message> getAllMessagesForUser(int accountId){
+        return MessageDAO.getAllMessagesForUser(accountId);
+
+    }
+
+    //public Message updateMessageById(int id, Message message){
+
+       // return messageDAO.updateMessage(id, message);
+        // Message existingMessage = messageDAO.updateMessage(id, message);
+        // if (existingMessage == null) {
+        //     try {
+        //         throw new IOException("no message in the database");
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     } // Flight ID does not exist in database
+        // }
+        // // Update the flight data
+        // existingMessage.setMessage_text(message.getMessage_text());
+        // messageDAO.updateMessage(id, existingMessage);
+        
+        // return existingMessage; // Return the updated flight
+       
+     //}
+
+    //  public Message updateMessageById(int id, Message message) {
+    //     Message existingMessage;
+    // if (messageDAO.getMessagesById(id) == null) {
+    //     try {
+    //         throw new IOException("Message with ID " + id + " does not exist");
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+    
+    // existingMessage = messageDAO.getMessagesById(id);
+    // existingMessage.setMessage_text(message.getMessage_text());
+    // existingMessage.setTime_posted_epoch(message.getTime_posted_epoch());
+    
+    // messageDAO.updateMessage(id,existingMessage);
+    // return existingMessage;
+    // }
+ 
     
     
 }

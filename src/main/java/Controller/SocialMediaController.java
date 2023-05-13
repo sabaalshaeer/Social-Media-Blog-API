@@ -2,12 +2,15 @@ package Controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import DAO.MessageDAO;
 import Model.Account;
 import Model.Message;
 import Service.AccountService;
@@ -64,7 +67,9 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         // endpoint for deleting message with specific id
         app.delete("/messages/{message_id}", this::DeleteMessageByIdHandler);
-            
+        app.put("/messages/{message_id}", this::updateMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::getMessageByUserHandler);
+
 
         return app;
     }
@@ -80,6 +85,8 @@ public class SocialMediaController {
      * @throws IOException
      * @throws SQLException
      */
+
+     //Context object is a parameter, which likely contains information about the request being made to the application
 
     private void postAccountHandler(Context ctx) throws JsonMappingException, JsonProcessingException  {
         //ObjectMapper is used to convert the HTTP request body (which is in JSON format) into an instance of the Account class, 
@@ -158,13 +165,58 @@ public class SocialMediaController {
         
         if (message == null) {
             // If no message is found, set the status code to 200 and send an empty response body, which is what the test is expecting.
-            ctx.status(200).json("");           
+            ctx.status(200);           
         } else {
             // If a message is found, return it as a JSON response
             ctx.json(om.writeValueAsString(message));
         }
-
     }
+
+    //Handler to updating message by its id
+    private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        int message_id = Integer.parseInt(ctx.pathParam("message_id")); 
+        Message message = mapper.readValue(ctx.body(), Message.class);
+         // Check if the message ID exists in the database
+         if (!MessageDAO.checkMessageInDbById(message_id)) {
+            ctx.status(404).result("Message with ID " + message_id + " does not exist");        
+        }
+        
+        try {
+            Message updatedMessage = messageService.updateMessageById(message_id, message);
+            if (!(updatedMessage == null)) {
+                ctx.status(200).json(updatedMessage);
+            } else {
+                ctx.status(400).result("Message with ID " + message_id + " does not exist");
+            }
+        } catch (Exception e) {
+            ctx.status(404).result("Message with ID " + message_id + " does not exist");
+        }
+    }
+
+    //Handler to get message by accountid
+    private void getMessageByUserHandler(Context ctx) throws JsonProcessingException {
+        int accountId = Integer.parseInt(ctx.pathParam("account_id"));
+
+    // Get the messages by account ID from the message service
+    List<Message> messages = messageService.getAllMessagesForUser(accountId);
+    // if (messages == null || messages.isEmpty()) {
+    //     // No messages found
+    //     ctx.status(200).json("No messages found");
+    // } else {
+    //     ctx.status(200).json(messages);
+    // }
+
+    if (!(messages == null || messages.isEmpty())) {
+        ctx.status(200).json(messages);
+    } else {
+         // If no messages are found, return an empty JSON array
+         ctx.status(200).json(new ArrayList<>());
+    }
+    
+    }
+    
 
     
 

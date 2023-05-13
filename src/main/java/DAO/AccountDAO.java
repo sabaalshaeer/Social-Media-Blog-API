@@ -139,7 +139,7 @@ public Account createAccount(Account account) {
         return false;
     }
     
-    //I have these next to methods but it did not required in this pre-project
+    //I have these next 3  methods for my reference but it not required in this pre-project
     // This method retrieves all accounts from the account table in the database and
     // returns them as a list of Account objects.
     public List<Account> getAllAccounts() {
@@ -195,6 +195,17 @@ public Account createAccount(Account account) {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    public void deleteAccount(int accountId) {
+        try {
+            String sql = "DELETE FROM account WHERE account_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, accountId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }
