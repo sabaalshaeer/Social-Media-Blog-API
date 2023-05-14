@@ -66,7 +66,7 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         // endpoint for deleting message with specific id
         app.delete("/messages/{message_id}", this::DeleteMessageByIdHandler);
-        app.put("/messages/{message_id}", this::updateMessageHandler);
+        app.patch("/messages/{message_id}", this::updateMessageHandler);
         app.get("/accounts/{account_id}/messages", this::getMessageByUserHandler);
 
         return app;
@@ -180,57 +180,58 @@ public class SocialMediaController {
         }
     }
 
-    // Handler to updating message by its id
-    // private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException{
-    //     try{
-    //         ObjectMapper om = new ObjectMapper();
-    //         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
-    //         Message message = om.readValue(ctx.body(), Message.class);
-    //          // Check if the request body contains only the message_text field
-    //         if (message.getMessage_id() != 0 || message.getPosted_by() != 0 || message.getTime_posted_epoch() != 0) {
-    //             ctx.status(400);
-    //             return;
-    //         }
-    //             // Update the message
-    //         Message updatedMessage = messageService.updateMessageById(messageId, message);
-
-    //         if (updatedMessage != null) {
-    //             if (!ctx.body().contains("message_text")) {
-    //                 ctx.status(400);
-    //                 return;
-    //               }
-    //             // If the update was successful, return the updated message
-    //             ctx.status(200).json(updatedMessage);
-    //         } else {
-    //             // If the update was not successful, return a 400 error
-    //             ctx.status(400);
-    //         }
-    //     }catch(IOException e){
-    //         ctx.status(400);
-    //     }
-        
-    // }
+    //Handler to updating message by its id
     private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException{
         try{
             ObjectMapper om = new ObjectMapper();
             int messageId = Integer.parseInt(ctx.pathParam("message_id"));
             Message message = om.readValue(ctx.body(), Message.class);
-            if (message.getMessage_text() == null || message.getMessage_text().trim().equals("") || message.getMessage_text().length() > 255) {
+             // Check if the request body contains only the message_text field
+            if (message.getMessage_id() != 0 || message.getPosted_by() != 0 || message.getTime_posted_epoch() != 0) {
                 ctx.status(400);
                 return;
             }
+                // Update the message
             Message updatedMessage = messageService.updateMessageById(messageId, message);
+
             if (updatedMessage != null) {
+                if (!ctx.body().contains("message_text")) {
+                    ctx.status(400);
+                    return;
+                  }
+                // If the update was successful, return the updated message
                 ctx.status(200).json(updatedMessage);
             } else {
+                // If the update was not successful, return a 400 error
                 ctx.status(400);
             }
-        } catch(IOException e){
-            ctx.status(400);
-        } catch(NumberFormatException e) {
+        }catch(IOException e){
             ctx.status(400);
         }
     }
+        
+    // }
+    // private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException{
+    //     try{
+    //         ObjectMapper om = new ObjectMapper();
+    //         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+    //         Message message = om.readValue(ctx.body(), Message.class);
+    //         if (message.getMessage_text() == null || message.getMessage_text().trim().equals("") || message.getMessage_text().length() > 255) {
+    //             ctx.status(400);
+    //             return;
+    //         }
+    //         Message updatedMessage = messageService.updateMessageById(messageId, message);
+    //         if (updatedMessage != null) {
+    //             ctx.status(200).json(updatedMessage);
+    //         } else {
+    //             ctx.status(400);
+    //         }
+    //     } catch(IOException e){
+    //         ctx.status(400);
+    //     } catch(NumberFormatException e) {
+    //         ctx.status(400);
+    //     }
+    // }
     
 
     // Handler to get message by accountid
