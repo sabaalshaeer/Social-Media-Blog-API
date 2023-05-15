@@ -66,7 +66,9 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         // endpoint for deleting message with specific id
         app.delete("/messages/{message_id}", this::DeleteMessageByIdHandler);
+        // endpoint for updatin message parcially 
         app.patch("/messages/{message_id}", this::updateMessageHandler);
+        // endpoint for get all messages for specific account
         app.get("/accounts/{account_id}/messages", this::getMessageByUserHandler);
 
         return app;
@@ -210,55 +212,15 @@ public class SocialMediaController {
         }
     }
         
-    // }
-    // private void updateMessageHandler(Context ctx) throws JsonMappingException, JsonProcessingException{
-    //     try{
-    //         ObjectMapper om = new ObjectMapper();
-    //         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
-    //         Message message = om.readValue(ctx.body(), Message.class);
-    //         if (message.getMessage_text() == null || message.getMessage_text().trim().equals("") || message.getMessage_text().length() > 255) {
-    //             ctx.status(400);
-    //             return;
-    //         }
-    //         Message updatedMessage = messageService.updateMessageById(messageId, message);
-    //         if (updatedMessage != null) {
-    //             ctx.status(200).json(updatedMessage);
-    //         } else {
-    //             ctx.status(400);
-    //         }
-    //     } catch(IOException e){
-    //         ctx.status(400);
-    //     } catch(NumberFormatException e) {
-    //         ctx.status(400);
-    //     }
-    // }
-    
 
-    // Handler to get message by accountid
+    // Handler to get message for specific account
     private void getMessageByUserHandler(Context ctx) throws JsonProcessingException {
         //"account_id" is a path parameter in the URL of an API endpoint that retrieves all messages for a specific account.
         int accountId = Integer.parseInt(ctx.pathParam("account_id"));
         
-    //       // Check if the account exists
-    // Account account = accountService.getAccountById(accountId);
-    // if (account == null) {
-    //     ctx.status(200).json(new ArrayList<>());
-    //     return;
-    // }
-        
         // Get the messages by account ID from the message service
         List<Message> messages = messageService.getAllMessagesForUser(accountId);
 
-
-    //      // Check if there are any messages
-    // if (!messages.isEmpty()) {
-    //     // Check if the messages belong to the specified account
-    //     for (Message message : messages) {
-    //         if (message.getPosted_by() != accountId) {
-    //             ctx.status(200).json(new ArrayList<>());
-    //                             return;
-    //         }
-    //     }
       if (!(messages.isEmpty())) {
             ctx.json(messages);
             //System.out.println(messages);

@@ -283,13 +283,6 @@ public class MessageDAO {
      */
 
     public static List<Message> getAllMessagesForUser(int account_id) {
-        // if (account_id <= 0) {
-        //     try {
-        //         throw new IOException("Account ID must be greater than 0");
-        //     } catch (IOException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
         List<Message> listOfMessage = new ArrayList<>();
 
         // Get the messages by account ID from the database
