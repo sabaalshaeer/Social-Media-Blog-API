@@ -36,12 +36,14 @@ public class MessageDAO {
         try {
             // Check if the message meets the required criteria
             if (message == null || message.getMessage_text().isBlank() || message.getMessage_text().length() > 254) {
-                throw new IOException("message is null or blank, or length greater than 254");
+                return null;
+                //throw new IOException("message is null or blank, or length greater than 254");
             }
 
             // Check if the message already exists in the database
             if (checkMessageTextInDb(message.getMessage_text())) {
-                throw new IOException("MESSAGE already exists");
+                return null;
+                //throw new IOException("MESSAGE already exists");
             }
 
             String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) Values(?,?,?)";
@@ -60,9 +62,10 @@ public class MessageDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } 
+        // catch (IOException e) {
+        //     e.printStackTrace();
+        // }
         return null;
     }
 
